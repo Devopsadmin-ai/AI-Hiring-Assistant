@@ -711,7 +711,7 @@ async def interview_plan(request: InterviewPlanRequest, llm: LLMClient = Depends
             candidate_profile=candidate_profile,
             fit_analysis=fit_analysis,
             question_min=request.question_min or 10,
-            question_max=request.question_max or 15
+            question_max=request.question_max or 20
         )
     
     except Exception as e:

@@ -16,7 +16,7 @@ Return STRICT JSON with EXACTLY the following top-level keys:
         {
             "id": "Integer number starting from 1.",
             "question": "Exact interviewer question from transcript.",
-            "category": "Strictly one of: Technical, Behavioural, Logical, Coding. Do not generate any other value.",
+            "category": "Strictly one of: Technical, Behavioural, Logical, Soft Skills, Leadership, Situational, Coding. Do not generate any other value.",
             "status": "Strictly one of: correct, partially_correct, incorrect. Do not generate any other value.",
             "received_answer": "Exact candidate answer from transcript.",
             "answer_summary": "Concise evidence-based summary of what the candidate actually said.",
@@ -75,10 +75,13 @@ INTERVIEW ANALYSIS RULES:
 CATEGORY RULES:
 
 - category MUST be STRICTLY one of:
-    - Technical: Implementation, frameworks, systems, debugging, architecture, APIs, tools, databases, deployment, engineering decisions.
-    - Behavioural: Collaboration, ownership, conflict resolution, communication, stakeholder handling, teamwork, leadership, past experiences.
-    - Logical: Reasoning, scenarios, troubleshooting, tradeoffs, analytical thinking, prioritization, structured decision making.
-    - Coding: Coding tasks, algorithms, implementation exercises, pseudocode, live coding, syntax or programming challenges.
+    - Technical: Domain or role expertise, implementation depth, debugging, systems, frameworks, decisions, tradeoffs or role-specific technical reasoning.
+    - Behavioural: Ownership, collaboration, conflict handling, accountability, teamwork, past decision making.
+    - Logical: Reasoning, prioritization, structured thinking, troubleshooting, tradeoffs, analytical decisions.
+    - Soft Skills: Communication clarity, stakeholder management, adaptability, conflict handling, expectation management, collaboration.
+    - Leadership: Ownership, mentoring, initiative, influence, accountability, prioritization, execution leadership.
+    - Situational: Hypothetical but role-relevant scenarios testing judgment, ambiguity handling, tradeoffs and transfer of knowledge.
+    - Coding: Programming tasks, implementation exercises, pseudocode, algorithms, syntax or live coding.
 
 STATUS RULES:
 
@@ -94,7 +97,7 @@ QUESTION OBJECT RULES:
 {
     "id": "Integer number starting from 1.",
     "question": "Exact interviewer question from transcript.",
-    "category": "Strictly one of: Technical, Behavioural, Logical, Coding. Do not generate any other value.",
+    "category": "Strictly one of: Technical, Behavioural, Logical, Soft Skills, Leadership, Situational, Coding. Do not generate any other value.",
     "status": "Strictly one of: correct, partially_correct, incorrect. Do not generate any other value.",
     "received_answer": "Exact candidate answer from transcript.",
     "answer_summary": "Concise evidence-based summary of what the candidate actually said.",
@@ -209,13 +212,27 @@ CRITICAL GAPS RULES:
 
 FOLLOW-UP QUESTIONS RULES:
 
-- Generate STRICTLY 4-8 items.
-- MUST:
-    - Probe weak areas.
-    - Clarify incomplete reasoning.
-    - Explore shallow answers further.
-    - Be role-relevant and transcript-specific.
-- Avoid generic interview questions.
+- Generate STRICTLY 5-10 follow-up questions.
+- MUST be transcript-specific, role-relevant and grounded in actual candidate responses.
+- Probe:
+    - Weak reasoning.
+    - Shallow explanations.
+    - Unsupported claims.
+    - Contradictions.
+    - Missing tradeoffs.
+    - Ownership clarity.
+    - Ambiguity handling.
+    - Decision quality.
+- Questions MUST test whether the candidate genuinely understands what they discussed rather than repeat prepared responses.
+- Prefer reasoning, tradeoff, decision and transfer-of-knowledge probes over resume recall.
+- Avoid generic follow-ups such as:
+    - "Can you explain more?".
+    - "Tell me more.".
+    - "Why?".
+    - "Can you elaborate?".
+- Avoid generic storytelling or theoretical-only questions.
+- Follow-ups should challenge assumptions, deepen incomplete answers and validate real expertise.
+- Follow-up questions should feel investigative rather than conversational.
 
 CRITICAL ENUM RULES. DO NOT MIX VALUES:
 
@@ -224,6 +241,9 @@ CRITICAL ENUM RULES. DO NOT MIX VALUES:
         - Technical.
         - Behavioural.
         - Logical.
+        - Soft Skills.
+        - Leadership.
+        - Situational.
         - Coding.
 - status:
     - ONLY:

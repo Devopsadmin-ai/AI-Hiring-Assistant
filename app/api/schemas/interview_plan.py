@@ -36,7 +36,7 @@ class CodingQuestionItem(BaseModel):
 
 
 class QuestionCategory(BaseModel):
-    category: Literal["Technical", "Behavioural", "Logical", "Coding"] = "Technical"
+    category: Literal["Technical", "Behavioural", "Logical", "Soft Skills", "Leadership", "Situational", "Coding"] = "Technical"
     questions: list[Union[StandardQuestionItem, CodingQuestionItem]] = []
 
 

@@ -11,7 +11,7 @@ class InterviewAnalyticalRequest(BaseModel):
 class InterviewAnalysisItem(BaseModel):
     id: int = 0
     question: str = ""
-    category: Literal["Technical", "Behavioural", "Logical", "Coding"] = "Technical"
+    category: Literal["Technical", "Behavioural", "Logical", "Soft Skills", "Leadership", "Situational", "Coding"] = "Technical"
     status: Literal["correct", "partially_correct", "incorrect"] = "partially_correct"
     received_answer: str = ""
     answer_summary: str = ""

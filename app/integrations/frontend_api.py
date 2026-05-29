@@ -115,7 +115,7 @@ def _file_input(data: bytes, filename: str) -> dict:
 def _ensure_https(url: str) -> str:
     url = url.strip()
     
-    if url and not url.startswith("http"):
+    if url and not url.lower().startswith("http"):
         url = "https://" + url
     
     return url
@@ -124,14 +124,42 @@ def _ensure_https(url: str) -> str:
 def _extract_linkedin_pdf(content: bytes) -> str:
     try:
         doc = fitz.open(stream=content, filetype="pdf")
-        
+
         for page in doc:
             for link in page.get_links():
                 uri = link.get("uri", "")
-                
-                if "linkedin.com" in uri.lower():
+
+                if uri and "linkedin.com" in uri.lower():
                     return _ensure_https(uri)
-    
+
+        all_text = " ".join(page.get_text("text") for page in doc)
+        all_text = re.sub(r"\s+", " ", all_text)
+
+        patterns = [
+            r"https?://(?:www\.)?linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+            r"(?:www\.)?linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+            r"linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+            r"linkedin\.com/pub/[a-zA-Z0-9._/-]+"
+        ]
+
+        for pattern in patterns:
+            m = re.search(pattern, all_text, re.IGNORECASE)
+
+            if m:
+                return _ensure_https(m.group(0))
+
+        label = re.search(r"(?:linkedin|linked-in)\s*[:\-]?\s*([\w\.\/\-]+)", all_text, re.IGNORECASE)
+
+        if label:
+            raw = label.group(1).strip().rstrip("/")
+            skip = {"profile", "com", "in", "linkedin", "www"}
+
+            if raw and raw.lower() not in skip:
+                if "linkedin.com" not in raw.lower():
+                    return f"https://linkedin.com/in/{raw}"
+
+                return _ensure_https(raw)
+
     except Exception as e:
         logger.error(f"LinkedIn extraction in .pdf failed : {e}")
     
@@ -149,18 +177,20 @@ def _extract_linkedin_docx(content: bytes) -> str:
                 for rel in tree:
                     target = rel.get("Target", "")
                     mode = rel.get("TargetMode", "")
-                    
-                    if mode == "External" and "linkedin.com" in target.lower():
+
+                    if mode == "External" and target and "linkedin.com" in target.lower():
                         return _ensure_https(target)
 
             doc_xml = z.read("word/document.xml")
             tree = etree.fromstring(doc_xml)
             all_text = " ".join(t for t in tree.itertext())
+            all_text = re.sub(r"\s+", " ", all_text)
 
             patterns = [
-                r"https?://(?:www\.)?linkedin\.com/in/[\w\-]+",
-                r"(?:www\.)?linkedin\.com/in/[\w\-]+",
-                r"linkedin\.com/pub/[\w\-/]+"
+                r"https?://(?:www\.)?linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+                r"(?:www\.)?linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+                r"linkedin\.com/in/[a-zA-Z0-9._-]+/?",
+                r"linkedin\.com/pub/[a-zA-Z0-9._/-]+"
             ]
 
             for pattern in patterns:
@@ -174,11 +204,11 @@ def _extract_linkedin_docx(content: bytes) -> str:
             if label:
                 raw = label.group(1).strip().rstrip("/")
                 skip = {"profile", "com", "in", "linkedin", "www"}
-                
+
                 if raw and raw.lower() not in skip:
-                    if "." not in raw and "/" not in raw:
+                    if "linkedin.com" not in raw.lower():
                         return f"https://linkedin.com/in/{raw}"
-                    
+
                     return _ensure_https(raw)
 
     except Exception as e:
@@ -200,10 +230,10 @@ def extract_linkedin_from_bytes(content: bytes, filename: str) -> str:
         url = ""
     
     if url:
-        logger.info(f"LinkedIn extracted from hyperlinks : {url!r}")
+        logger.info(f"LinkedIn extracted from document : {url!r}")
     
     else:
-        logger.info("LinkedIn not found in hyperlinks")
+        logger.info("LinkedIn not found in document")
     
     return url
 

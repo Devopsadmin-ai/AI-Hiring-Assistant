@@ -35,7 +35,7 @@ Return STRICT JSON with EXACTLY the following top-level keys:
                 "start_date": "Start date in YYYY-MM format. Use null if not found.",
                 "end_date": "End date in YYYY-MM format. Use null if not found or if currently working.",
                 "duration_months": "Return 0.",
-                "responsibilities": ["Maximum 3 items. Start each with a strong action verb. Be specific - include metrics, technologies, outcomes where present in resume."],
+                "responsibilities": ["Start each with a strong action verb. Be specific - include metrics, technologies, outcomes where present in resume."],
                 "technologies": ["Technology names in title case. Avoid duplicates."]
             }
         ],
